@@ -2,7 +2,7 @@
 
 return [
     'host' => '127.0.0.1',
-    'name' => 'paolo-ojt-app2',
+    'name' => 'dbname',
     'user' => 'root',
     'password' => '',
     'options' => [
