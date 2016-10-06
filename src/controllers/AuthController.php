@@ -10,7 +10,6 @@ class AuthController extends Controller
 
     public function logout()
     {
-        echo 'Logging out...';
-        exit;
+        redirect('/ ');
     }
 }
