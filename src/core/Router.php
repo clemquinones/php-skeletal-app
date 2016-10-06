@@ -14,45 +14,29 @@ class Router
         $this->controllersPath  = $this->app->config['web']['source_path'] .
                                   trim($this->app->config['web']['controllers_path'], '/').'/';
 
-        //Load the page error handler
-        $this->routes = array_merge($this->routes, [
-            'error_404' => $this->app->config['web']['error_404']
-        ]);
-
-        //Load abstract Controller
-        require $this->controllersPath . 'Controller.php';
+        //Load routes
+        $this->routes = array_merge(
+            ['error_404' => $this->app->config['web']['error_404']],
+            $this->app->config['routes']
+        );
     }
-
-
-    /**
-     * Defined the routes
-     * 
-     * @param array $routes
-     * @return Router
-     */
-    public static function load(array $routes)
-    {
-        $router = new static;
-        $router->routes = array_merge($router->routes, $routes);
-
-        return $router;
-    }
-
 
     /**
      * Load the target controller's method
      * 
      * @param string $uri
      */
-    public function direct($uri)
+    public static function direct($uri)
     {
+        $router = new static;
+
         //Load the target Controller
-        if (array_key_exists($uri, $this->routes)) {
-            return $this->callClassMethod($this->routes[$uri]);
+        if (array_key_exists($uri, $router->routes)) {
+            return $router->callClassMethod($router->routes[$uri]);
         }
 
         //Show a page not found.
-        return $this->error404();
+        return $router->error404();
     }
 
 
@@ -65,11 +49,17 @@ class Router
     {
         list($class, $method) = explode('@', $target);
 
-        require $this->controllersPath . $class . '.php';
+        //Load parent Controller
+        if (! class_exists('Controller')) {
+            require $this->controllersPath . 'Controller.php';            
+        }
 
-        $controller = new $class;
+        if (! class_exists($class)) {
+            require $this->controllersPath . $class . '.php';
+            return (new $class($this->app))->{$method}();
+        }
 
-        return $controller->{$method}();
+        throw new Exception('Controller not found');
     }
 
 

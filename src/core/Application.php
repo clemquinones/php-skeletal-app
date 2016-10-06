@@ -11,23 +11,32 @@ class Application
         $this->config['web'] = require 'config/web.php';
         $this->config['database'] = require 'config/database.php';
         $this->config['routes'] = require 'config/routes.php';
+
+        $this->loadDatabase();
     }
+
+
+    public function loadDatabase()
+    {
+        if ($this->db) return;
+
+        //Establised the connection
+        $this->db = new QueryBuilder(
+            Connection::make($this->config['database'])
+        );
+    }
+
 
     /**
      * Boot the app
      * 
      */
-    public function run()
+    public static function run()
     {
-        //Establised the connection
-        $this->db = new QueryBuilder(
-            Connection::make($this->config['database'])
-        );
-
-        //Load defined routes and direct traffic to target controller based on current uri
-        Router::load($this->config['routes'])
-            ->direct(Request::uri());
+       //Direct traffic to target controller based on current uri
+        Router::direct(Request::uri());
     }
+
 
     public static function config($key)
     {

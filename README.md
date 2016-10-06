@@ -1,1 +1,1 @@
-#A simple skeletal app made by PHP.
+#A simple skeletal app made from PHP.

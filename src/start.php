@@ -2,4 +2,4 @@
 
 require 'bootstrap.php';
 
-$app->run();
+Application::run();
